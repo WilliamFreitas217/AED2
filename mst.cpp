@@ -343,7 +343,7 @@ void Lista<Tipo>::mostra(){
 	No<Tipo> *p = prim->getProx();
 	while(p!= NULL){
     	// cout<<p->getItem().getItem().getNome();
-    	cout<<p->getItem();
+    	cout<<p->getItem().getVertice();
     	p = p->getProx();
 		if(p!=NULL){
 			cout<<", ";
@@ -400,15 +400,52 @@ template <class Tipo>
 int Lista<Tipo>::getTam(){
     return tam;
 }
+typedef int Peso;
+typedef int Vertice;
+class Par{
+private:
+    Vertice vertice;
+    Peso pesoAresta;
+public:
+    Par();
+    Par(Vertice vertice, Peso pesoAresta);
+    Vertice getVertice();
+    Peso getPesoAresta();
+    void setVertice(Vertice vertice);
+    void setPesoAresta(Peso pesoAresta);
+};
+
+Par::Par(){
+}
+
+Par::Par(Vertice vertice, Peso pesoAresta){
+    this->vertice = vertice;
+    this->pesoAresta = pesoAresta;
+}
+
+Vertice Par::getVertice(){
+    return vertice;
+}
+
+Peso Par::getPesoAresta(){
+    return pesoAresta;
+}
+
+void Par::setVertice(Vertice vertice){
+    this->vertice = vertice;
+}
+
+void Par::setPesoAresta(Peso pesoAresta){
+    this->pesoAresta = pesoAresta;
+}
 
 typedef int Peso;
 typedef int Vertice;
 class Grafo{
 private:
-    Lista<int> *adj;
+    Lista<Par> *adj;
     int n; //ordem
     int m; //tam
-    int **mat;
     void destruir();
 public:
 	Grafo();
@@ -416,57 +453,41 @@ public:
 	void inicializar(int n);
     void inserirVertice(Vertice u, Vertice v, Peso w);
     void ordenarADJ();
-    Lista<int> *getAdj();
+    Lista<Par> *getAdj();
     void mostra();
 	void setN(int n);
 	void setM(int m);
 	int getM();
 	int getN();
-    Peso **&getMat();
-    int w(int u, int v);
+    int w(Vertice u, Vertice v);
 
 };
-
 
 Grafo::Grafo(){
 }
 
-
 Grafo::Grafo(int n){
     this->n = 0;
     this->m = 0;
-    mat = new Peso *[n];
-    for(int i=0; i<=n; i++){
-      mat[i] = new Peso[n];
-    }
 	inicializar(n);
 }
 
 
 void Grafo::inicializar(int n){
-    for(int i=0; i<n; i++){
-        for(int j=0; j<n; j++){
-          mat[i][j]=0;
-        }
-    }
 	if(this->n != 0){
 		destruir();
 	}
 	this->n = n;
-	adj = new Lista<Vertice>[n+1];
+	adj = new Lista<Par>[n+1];
 }
-
 
 void Grafo::inserirVertice(Vertice u, Vertice v, Peso w){
-	Vertice x = v;
+    Par x(v, w);
 	adj[u].insere(x);
-	x = u;
+	x.setVertice(u);
+    x.setPesoAresta(w);
 	adj[v].insere(x);
-    mat[u-1][v-1] = w;
-    mat[v-1][u-1] = w; //deve ser desativada caso o grafo seja direcionado
-	m++;
 }
-
 
 void Grafo::mostra(){
     cout<<" Listas de Adjacências \t"<<endl;
@@ -475,28 +496,7 @@ void Grafo::mostra(){
 		adj[i].mostra();
 		cout<<"}"<<endl;
 	}
-    cout<<"------------------------------------------------------"<<endl;
-    cout<<" Matriz de Adjacências \t"<<endl;
-    int k = 3;
-    cout<<" ";
-    for(int j=0; j< n; j++){
-        cout<< setw(k)<<j+1;
-    }
-    cout<<endl;
-    for(int j=0; j< n*k+3; j++){
-        cout<<"-";
-    }
-    cout<<endl;
-    for(int i=0; i<n; i++){
-        cout<<setw(1)<<i+1;
-        cout<<"|";
-        for(int j=0; j<n; j++){
-            cout<<setw(k)<<mat[i][j];
-        }
-        cout<<endl;
-    }
 }
-
 
 void Grafo::destruir(){
 	for(int i=0; i<=n; i++){
@@ -506,60 +506,65 @@ void Grafo::destruir(){
 	n=m=0;
 }
 
-
-Lista<Vertice> *Grafo::getAdj(){
+Lista<Par> *Grafo::getAdj(){
 	return adj;
 }
-
 
 void Grafo::setN(int n){
 	this->n = n;
 }
 
-
 void Grafo::setM(int m){
 	this->m = m;
 }
-
 
 int Grafo::getN(){
 	return n;
 }
 
-
 int Grafo::getM(){
 	return m;
 }
 
-
 void Grafo::ordenarADJ(){
     for(int i=1; i<=n; i++){
-        Vertice *vetor = new Vertice[adj[i].getTam()+1];
+        int *vetorV = new int[adj[i].getTam()+1];
+        int *vetorE = new int[adj[i].getTam()+1];
         int k = 1;
-        No<Vertice> *v = adj[i].getPrim()->getProx();
+        No<Par> *v = adj[i].getPrim()->getProx();
         while (v!=NULL) {
-            vetor[k] = v->getItem();
+            vetorV[k] = v->getItem().getVertice();
+            vetorE[k] = v ->getItem().getPesoAresta();
             k++;
             v = v->getProx();
         }
-        Heap<Vertice> heap;
-        heap.heapSort(vetor, k);
+        Heap<int> heapV, heapE;
+        heapV.heapSort(vetorV, k);
+        heapE.heapSort(vetorE, k);
         k = 1;
         v = adj[i].getPrim()->getProx();
         while (v!=NULL) {
-            v->getItem()=vetor[k];
+            v->getItem().setVertice(vetorV[k]);
+            v->getItem().setPesoAresta(vetorE[k]);
             k++;
             v = v->getProx();
         }
     }
 }
 
-int Grafo::w(int u, int v){
-    return mat[u][v];
-}
-
-Peso **&Grafo::getMat(){
-	return mat;
+int Grafo::w(Vertice u, Vertice v){
+    for(int i=1; i<=n; i++){
+        if(i==u){
+            No<Par> *p = adj[i].getPrim()->getProx();
+            while(p!=NULL){
+                if(p->getItem().getVertice()==v){
+                    return p->getItem().getPesoAresta();
+                }
+                p = p->getProx();
+            }
+        }
+    }
+    return INT_MAX;
 }
 
 class MST{
@@ -586,15 +591,14 @@ void MST::mstPrim(Grafo &g, int r){
     }
     while(Q.getTam()!=0){
         int u = Q.extrairMin(u);
-        // cout<<u<<endl;
-        Lista<Vertice> vetor = g.getAdj()[u];
-        No<Vertice> *v = vetor.getPrim()->getProx();
+        Lista<Par> vetor = g.getAdj()[u];
+        No<Par> *v = vetor.getPrim()->getProx();
         while(v!=NULL){
-            // cout<<"mat["<<u<<"]["<<v->getItem()<<"]:::: "<<g.w(u-1, v->getItem()-1)<<endl;
-            if(g.w(u-1, v->getItem()-1)<chaves[v->getItem()] && Q.verificar(v->getItem())){
-                // cout<<v->getItem()<<endl;
-                predecessores[v->getItem()]=u;
-                chaves[v->getItem()]=g.w(u-1, v->getItem()-1);
+            int peso = g.w(u, v->getItem().getVertice());
+            int vertice = v->getItem().getVertice();
+            if(peso < chaves[vertice] && Q.verificar(vertice)){
+                predecessores[vertice]=u;
+                chaves[v->getItem().getVertice()]=peso;
             }
             v = v->getProx();
         }
