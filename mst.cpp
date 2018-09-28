@@ -45,13 +45,13 @@ template <class Tipo>
 void Heap<Tipo>::heapfica(Tipo *&vetor, int i, int tamHeap){
     int l = esq(i), r =dir(i);
     int maior = 1;
-    if(l<=tamHeap && vetor[l]>vetor[i]){
+    if(l<=tamHeap && vetor[l].getVertice()>vetor[i].getVertice()){
         maior =l;
     }
     else{
         maior = i;
     }
-    if(r<=tamHeap && vetor[r]>vetor[maior]){
+    if(r<=tamHeap && vetor[r].getVertice()>vetor[maior].getVertice()){
         maior = r;
     }
     if(maior != i){
@@ -160,129 +160,6 @@ void No<Tipo>::setProx(No<Tipo> *no){
 }
 
 template <class Tipo>
-class FilaDePrioridade{
-private:
-    No<Tipo> *prim;
-	No<Tipo> *ult;
-    int tam;
-public:
-    FilaDePrioridade();
-    No<Tipo> *getPrim();
-    No<Tipo> *getUlt();
-    int getTam();
-    Tipo extrairMin(Tipo &item);
-	void insere(Tipo&);
-    void decrescerMin(int chave, int chaveNova);
-	No<Tipo> *minimo();
-	void runHeap();
-    bool verificar(int chaveDoVertice);
-	void mostra();
-};
-
-template <class Tipo>
-FilaDePrioridade<Tipo>::FilaDePrioridade(){
-    prim = new No<Tipo>();
-	ult = prim;
-    tam=0;
-}
-
-template <class Tipo>
-void FilaDePrioridade<Tipo>::insere(Tipo &item){
-	ult->setProx(new No<Tipo>());
-	ult = ult->getProx();
-	ult->setItem(item);
-    tam++;
-    runHeap();
-}
-
-template <class Tipo>
-No<Tipo> *FilaDePrioridade<Tipo>::minimo(){
-    No<Tipo> *p = prim->getProx();
-    No<Tipo> *menor = p;
-    while(p!=NULL){
-        if(menor->getItem().getChave()>=p->getItem().getChave()){
-            menor = p;
-        }
-        p = p->getProx();
-    }
-    return menor;
-}
-
-template <class Tipo>
-void FilaDePrioridade<Tipo>::runHeap(){
-    Tipo *vetor = new Tipo[tam+1];
-    No<Tipo> *v = prim->getProx();
-    int k =1;
-    while (v!=NULL) {
-        vetor[k] = v->getItem();
-        k++;
-        v = v->getProx();
-    }
-    Heap<int> heap;
-    heap.heapSort(vetor, tam);
-    k = 1;
-    v = prim->getProx();
-    while (v!=NULL) {
-        v->getItem()=vetor[k];
-        k++;
-        v = v->getProx();
-    }
-}
-
-template <class Tipo>
-Tipo FilaDePrioridade<Tipo>::extrairMin(Tipo &item){
- 	No<Tipo> *p = prim;
-	// item = new Tipo;
- 	prim = prim->getProx();
-	item = prim->getItem();
-	delete p;
-    tam--;
-	return item;
-}
-
-template <class Tipo>
-void FilaDePrioridade<Tipo>::mostra(){
-	No<Tipo> *p = prim->getProx();
-	while(p!= NULL){
-    	// cout<<p->getItem().getItem().getNome();
-    	cout<<p->getItem().getChave();
-    	p = p->getProx();
-		if(p!=NULL){
-			cout<<", ";
-		}
-    }
-}
-
-template <class Tipo>
-void FilaDePrioridade<Tipo>::decrescerMin(int chave, int chaveNova){
-    No<Tipo> *p = prim->getProx();
-	while(p!= NULL){
-        if(p->getItem()==chave){
-            p->getItem().setChave(chaveNova);
-            break;
-        }
-        p = p->getProx();
-    }
-}
-
-template <class Tipo>
-bool FilaDePrioridade<Tipo>::verificar(int chaveDoVertice){
-    No<Tipo> *p = prim->getProx();
-	while(p!= NULL){
-        if(p->getItem()==chaveDoVertice){
-            return true;
-        }
-        p = p->getProx();
-    }
-    return false;
-}
-
-template <class Tipo>
-int FilaDePrioridade<Tipo>::getTam(){
-    return tam;
-}
-
-template <class Tipo>
 class Lista{
 private:
 	No<Tipo> *prim;
@@ -342,7 +219,6 @@ template <class Tipo>
 void Lista<Tipo>::mostra(){
 	No<Tipo> *p = prim->getProx();
 	while(p!= NULL){
-    	// cout<<p->getItem().getItem().getNome();
     	cout<<p->getItem().getVertice();
     	p = p->getProx();
 		if(p!=NULL){
@@ -389,7 +265,6 @@ No<Tipo> *Lista<Tipo>::Busca(Tipo objeto){
 
 template <class Tipo>
 void Lista<Tipo>::destruir(){
-	// cout<<"aqui"<<endl;
 	No<Tipo> *p = prim->getProx();
 	while(p!=NULL){
 		delete p;
@@ -439,13 +314,121 @@ void Par::setPesoAresta(Peso pesoAresta){
     this->pesoAresta = pesoAresta;
 }
 
+class FilaDePrioridade{
+private:
+    int tamHeap;
+    int *vetor;
+    int pai(int i);
+    int esq(int i);
+    int dir(int i);
+public:
+    FilaDePrioridade();
+    FilaDePrioridade(int tam);
+    void heapficaMin(int i);
+    int minimo();
+    void decrescerMin(int i, int vertice);
+    void insere(int vertice);
+    int extrairMin();
+    int getTamHeap();
+    bool verificar(int chaveDoVertice);
+	void mostra();
+};
+int FilaDePrioridade::pai(int i){
+    return floor(i/2);
+}
+
+int FilaDePrioridade::esq(int i){
+    return 2*i;
+}
+
+int FilaDePrioridade::dir(int i){
+    return 2*i+1;
+}
+
+
+FilaDePrioridade::FilaDePrioridade(){
+}
+
+FilaDePrioridade::FilaDePrioridade(int tam){
+    this->tamHeap = 0;
+    vetor = new int[tam+1];
+}
+
+void FilaDePrioridade::heapficaMin(int i){
+    int l = esq(i), r =dir(i);
+    int menor = 1;
+    if(l<=tamHeap && vetor[l]<vetor[i]){
+        menor =l;
+    }
+    else{
+        menor = i;
+    }
+    if(r<=tamHeap && vetor[r]<vetor[menor]){
+        menor = r;
+    }
+    if(menor != i){
+        troca(vetor[i], vetor[menor]);
+        heapficaMin(menor);
+    }
+}
+
+void FilaDePrioridade::insere(int vertice){
+	tamHeap++;
+    vetor[tamHeap] = vertice;
+    decrescerMin(tamHeap, vertice);
+}
+
+
+int FilaDePrioridade::minimo(){
+    return vetor[1];
+}
+
+int FilaDePrioridade::extrairMin(){
+ 	int minimo = vetor[1];
+    vetor[1] = vetor[tamHeap];
+    tamHeap--;
+    heapficaMin(1);
+	return minimo;
+}
+
+void FilaDePrioridade::mostra(){
+	for(int i=1; i<tamHeap+1; i++){
+        cout<<"Vertice: "<<vetor[i]<<endl;
+    }
+}
+
+
+void FilaDePrioridade::decrescerMin(int i, int vertice){
+    if(vertice>vetor[i]){
+        cout<<"valor inferior \n ACAO NAO PERMITIDA"<<endl;
+    }
+    vetor[i]=vertice;
+    while (i>1 && vetor[i/2]>vetor[i]) {
+        troca(vetor[i/2], vetor[i]);
+        i = i/2;
+    }
+}
+
+bool FilaDePrioridade::verificar(int chaveDoVertice){
+    for(int i=1; i<tamHeap+1; i++){
+        if(vetor[i]==chaveDoVertice){
+            return true;
+        }
+    }
+    return false;
+}
+
+int FilaDePrioridade::getTamHeap(){
+    return tamHeap;
+}
+
 typedef int Peso;
 typedef int Vertice;
 class Grafo{
 private:
     Lista<Par> *adj;
-    int n; //ordem
-    int m; //tam
+int n;
+int m;
     void destruir();
 public:
 	Grafo();
@@ -528,24 +511,20 @@ int Grafo::getM(){
 
 void Grafo::ordenarADJ(){
     for(int i=1; i<=n; i++){
-        int *vetorV = new int[adj[i].getTam()+1];
-        int *vetorE = new int[adj[i].getTam()+1];
+        Par *vetor = new Par[adj[i].getTam()+1];
         int k = 1;
         No<Par> *v = adj[i].getPrim()->getProx();
         while (v!=NULL) {
-            vetorV[k] = v->getItem().getVertice();
-            vetorE[k] = v ->getItem().getPesoAresta();
+            vetor[k] = v->getItem();
             k++;
             v = v->getProx();
         }
-        Heap<int> heapV, heapE;
-        heapV.heapSort(vetorV, k);
-        heapE.heapSort(vetorE, k);
+        Heap<Par> heap;
+        heap.heapSort(vetor, k);
         k = 1;
         v = adj[i].getPrim()->getProx();
         while (v!=NULL) {
-            v->getItem().setVertice(vetorV[k]);
-            v->getItem().setPesoAresta(vetorE[k]);
+            v->setItem(vetor[k]);
             k++;
             v = v->getProx();
         }
@@ -573,8 +552,6 @@ private:
     int *predecessores;
 public:
     void mstPrim(Grafo &g, int r);
-    // void mostraChaves();
-    // void mostraPredecessores();
 };
 
 void MST::mstPrim(Grafo &g, int r){
@@ -585,12 +562,12 @@ void MST::mstPrim(Grafo &g, int r){
         predecessores[u]=0;
     }
     chaves[r]=0;
-    FilaDePrioridade<int> Q;
+    FilaDePrioridade Q(g.getN());
     for(int i=1; i<=g.getN(); i++){
         Q.insere(i);
     }
-    while(Q.getTam()!=0){
-        int u = Q.extrairMin(u);
+    while(Q.getTamHeap()>0){
+        int u = Q.extrairMin();
         Lista<Par> vetor = g.getAdj()[u];
         No<Par> *v = vetor.getPrim()->getProx();
         while(v!=NULL){
@@ -598,7 +575,7 @@ void MST::mstPrim(Grafo &g, int r){
             int vertice = v->getItem().getVertice();
             if(peso < chaves[vertice] && Q.verificar(vertice)){
                 predecessores[vertice]=u;
-                chaves[v->getItem().getVertice()]=peso;
+                chaves[vertice]=peso;
             }
             v = v->getProx();
         }
@@ -612,27 +589,6 @@ void MST::mstPrim(Grafo &g, int r){
 }
 
 void testaGrafo(Grafo &g){
-    // Item a, b, c, d, e, f, h;
-    // a.setNome("Will");
-    // b.setNome("Artur");
-    // c.setNome("Gian");
-    // d.setNome("Lucas");
-    // e.setNome("Arthur");
-    // f.setNome("Leticia");
-    // h.setNome("Mari");
-    // Vertice a1, b1, c1, d1, e1, f1;
-    // a1.setChave(1);
-    // a1.setItem(a);
-    // b1.setChave(2);
-    // b1.setItem(b);
-    // c1.setChave(3);
-    // c1.setItem(c);
-    // d1.setChave(4);
-    // d1.setItem(d);
-    // e1.setChave(5);
-    // e1.setItem(e);
-    // f1.setChave(6);
-    // f1.setItem(f);
     MST mst;
 	g.inserirVertice(1, 2, 4);
 	g.inserirVertice(1, 8, 8);
@@ -647,6 +603,7 @@ void testaGrafo(Grafo &g){
     g.inserirVertice(6, 7, 2);
     g.inserirVertice(7, 8, 1);
     g.inserirVertice(7, 9, 6);
+    g.inserirVertice(8, 9, 7);
 	g.mostra();
     mst.mstPrim(g, 1);
 }
