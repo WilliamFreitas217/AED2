@@ -44,13 +44,15 @@ void imprime(Tipo *vetor, int tam){
   }
 }
 int main(int argc, char const *argv[]) {
-  int vetor[6];
-  vetor[0]= 1;
-  vetor[1]= 2;
-  vetor[2]= 3;
-  vetor[3]= 4;
-  vetor[4]= 5;
-  quickSort(vetor, 0, 6);
-  imprime(vetor, 6);
+  int vetor[100];
+  int size = 100;
+  for(int i=0; i<size; i++){
+      int item = 0;
+      cin>> item;
+      vetor[i] =item;
+
+  }
+  quickSort(vetor, 0, size);
+  imprime(vetor, size);
   return 0;
 }

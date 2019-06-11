@@ -29,7 +29,7 @@ public:
 
 template <class Tipo>
 int Heap<Tipo>::pai(int i){
-    return floor(i);
+    return floor(i/2);
 }
 
 template <class Tipo>
@@ -46,14 +46,14 @@ template <class Tipo>
 void Heap<Tipo>::heapfica(Tipo *&vetor, int i, int tamHeap){
     int l = esq(i), r =dir(i);
     int maior = 1;
-    if(l<=tamHeap && vetor[l].getChave()>vetor[i].getChave()){
-            maior =l;
+    if(l<=tamHeap && vetor[l].getPesoAresta()>vetor[i].getPesoAresta()){
+        maior =l;
     }
     else{
         maior = i;
     }
-    if(r<=tamHeap && vetor[r].getChave()>vetor[maior].getChave()){
-            maior = r;
+    if(r<=tamHeap && vetor[r].getPesoAresta()>vetor[maior].getPesoAresta()){
+        maior = r;
     }
     if(maior != i){
         troca(vetor[i], vetor[maior]);
@@ -63,7 +63,7 @@ void Heap<Tipo>::heapfica(Tipo *&vetor, int i, int tamHeap){
 template <class Tipo>
 void Heap<Tipo>::constroiHeap(Tipo*&vetor, int &tamHeap, int tam){
     tamHeap = tam-1;
-    for(int i = floor(tamHeap); i>=1; i--){
+    for(int i = floor(tamHeap/2); i>=1; i--){
         heapfica(vetor,i, tamHeap);
     }
 }
@@ -84,31 +84,6 @@ void Heap<Tipo>::print(Tipo *vetor, int tam){
     }
 }
 
-class Item{
-private:
-    string nome;
-public:
-    Item();
-    Item(string nome);
-    string getNome();
-    void setNome(string nome);
-};
-
-Item::Item(){
-}
-
-Item::Item(string nome){
-    this->nome = nome;
-}
-
-string Item::getNome(){
-    return nome;
-}
-
-void Item::setNome(string nome){
-    this->nome = nome;
-}
-
 template <class Tipo>
 class No{
 private:
@@ -118,45 +93,38 @@ public:
 	No();
 	No(Tipo&);
 	void setItem(Tipo &);
-	void setProx(No<Tipo> *);
+	void setNo(No<Tipo> *);
 	void cria();
 	Tipo &getItem();
 	No<Tipo> *getProx();
 };
-
 template <class Tipo>
 No<Tipo>::No(){
  	this->prox = NULL;
 }
-
 template <class Tipo>
 void No<Tipo>::cria(){
 	this->prox = NULL;
 }
-
 template <class Tipo>
 No<Tipo>::No(Tipo &item){
 	this->item = item;
 	this->prox = NULL;
 }
-
 template <class Tipo>
 Tipo &No<Tipo>::getItem(){
 	return this->item;
 }
-
 template <class Tipo>
 No<Tipo> *No<Tipo>::getProx(){
 	return prox;
 }
-
 template <class Tipo>
 void No<Tipo>::setItem(Tipo &item){
 	this->item = item;
 }
-
 template <class Tipo>
-void No<Tipo>::setProx(No<Tipo> *no){
+void No<Tipo>::setNo(No<Tipo> *no){
 	this->prox = no;
 }
 
@@ -180,55 +148,46 @@ public:
 	void destruir();
     int getTam();
 };
-
 template <class Tipo>
 void Lista<Tipo>::setPrim(No<Tipo> *prim){
 	this->prim = prim;
 }
-
 template <class Tipo>
 void Lista<Tipo>::setUlt(No<Tipo> *ult){
 	this->ult = ult;
 }
-
 template <class Tipo>
 No<Tipo> *Lista<Tipo>::getPrim(){
 	return prim;
 }
-
 template <class Tipo>
 No<Tipo> *Lista<Tipo>::getUlt(){
 	return ult;
 }
-
 template <class Tipo>
 Lista<Tipo>::Lista(){
 	prim = new No<Tipo>();
 	ult = prim;
     tam=0;
 }
-
 template <class Tipo>
 void Lista<Tipo>::insere(Tipo &item){
-	ult->setProx(new No<Tipo>());
+	ult->setNo(new No<Tipo>());
 	ult = ult->getProx();
 	ult->setItem(item);
     tam++;
 }
-
 template <class Tipo>
 void Lista<Tipo>::mostra(){
 	No<Tipo> *p = prim->getProx();
 	while(p!= NULL){
-    	// cout<<" v: "<<p->getItem().getVertice()<< " || peso: "<<p->getItem().getPesoAresta();
-        cout<<p->getItem().getVertice();
+    	cout<<p->getItem().getVertice();
     	p = p->getProx();
-		if(p!=NULL){
-			cout<<", ";
-		}
-    }
+			if(p!=NULL){
+				cout<<", ";
+			}
+  }
 }
-
 template <class Tipo>
 No<Tipo> *Lista<Tipo>::PredecessorDe(No<Tipo> *r){
 	No<Tipo> *p = prim;
@@ -237,7 +196,6 @@ No<Tipo> *Lista<Tipo>::PredecessorDe(No<Tipo> *r){
 	}
   return p;
 }
-
 template <class Tipo>
 void Lista<Tipo>::Remove(No<Tipo> *r){
 	if((r==prim)||(r==NULL)){
@@ -245,7 +203,7 @@ void Lista<Tipo>::Remove(No<Tipo> *r){
   }
 	else{
   	No<Tipo> *p = PredecessorDe(r);
-  	p->setProx(Busca(r->getItem())->getProx());
+  	p->setNo(Busca(r->getItem())->getProx());
   	if(p==NULL){
     		ult = p;
   	}
@@ -255,7 +213,6 @@ void Lista<Tipo>::Remove(No<Tipo> *r){
   	delete r;
 	}
 }
-
 template <class Tipo>
 No<Tipo> *Lista<Tipo>::Busca(Tipo objeto){
 	No<Tipo> *p = prim->getProx();
@@ -267,18 +224,20 @@ No<Tipo> *Lista<Tipo>::Busca(Tipo objeto){
 
 template <class Tipo>
 void Lista<Tipo>::destruir(){
+	// cout<<"aqui"<<endl;
 	No<Tipo> *p = prim->getProx();
 	while(p!=NULL){
 		delete p;
 		p = p->getProx();
 	}
 }
+
 template <class Tipo>
 int Lista<Tipo>::getTam(){
     return tam;
 }
 
-typedef int Peso;
+typedef float Peso;
 typedef int Vertice;
 class Par{
 private:
@@ -320,7 +279,7 @@ void Par::setPesoAresta(Peso pesoAresta){
     this->pesoAresta = pesoAresta;
 }
 
-typedef int Peso;
+typedef float Peso;
 typedef int Vertice;
 class Grafo{
 private:
@@ -408,6 +367,28 @@ int Grafo::getM(){
 	return m;
 }
 
+void Grafo::ordenarADJ(){
+    for(int i=1; i<=n; i++){
+        Par *vetor = new Par[adj[i].getTam()+1];
+        int k = 1;
+        No<Par> *v = adj[i].getPrim()->getProx();
+        while (v!=NULL) {
+            vetor[k] = v->getItem();
+            k++;
+            v = v->getProx();
+        }
+        Heap<Par> heap;
+        heap.heapSort(vetor, k);
+        k = 1;
+        v = adj[i].getPrim()->getProx();
+        while (v!=NULL) {
+            v->setItem(vetor[k]);
+            k++;
+            v = v->getProx();
+        }
+    }
+}
+
 int Grafo::w(Vertice u, Vertice v){
     for(int i=1; i<=n; i++){
         if(i==u){
@@ -423,201 +404,175 @@ int Grafo::w(Vertice u, Vertice v){
     return INT_MAX;
 }
 
-class UnionFind{
+class BuscaProfundidade{
 private:
-    int *S;
-    int ordem;
+    int tempo;
+    Cor *cores;
+    int *tempoD;
+    int *tempoF;
+    int *predecessores;
+    int custoDoPercurso;
 public:
-    UnionFind();
-    UnionFind(int ordem);
-    int findSet(int x);
-    void unionThis(int x, int y);
-    void mostra();
-};
-UnionFind::UnionFind(){
-}
-
-UnionFind::UnionFind(int ordem){
-    this->ordem = ordem;
-    S = new int[ordem+1];
-    for(int i=1; i<=ordem; i++){
-        S[i]=NIL;
-        // cout<<i<<endl;
-    }
-}
-
-int UnionFind::findSet(int x){
-    if(S[x]==NIL){
-        return x;
-    }
-    return findSet(S[x]);
-}
-void UnionFind::unionThis(int x, int y){
-    int A = findSet(x);
-    int B = findSet(y);
-    S[A]=B;
-}
-void UnionFind::mostra(){
-    for(int i=1; i<=ordem; i++){
-        cout<<S[i]<<endl;
-    }
-}
-
-
-class Trio{
-private:
-    int vertice;
-    int vAdj;
-    int pesoAresta;
-public:
-    Trio();
-    Trio(int vertice, int vAdj, int pesoAresta);
-    int getVertice();
-    int getVAdj();
-    int getPesoAresta();
-    int getChave();
-    // int setChave(int chave);
-    void setVertice(int vertice);
-    void setVAdj(int adj);
-    void setPesoAresta(int pesoAresta);
+    void dfs(Grafo &g);
+    void dfsVisita(Grafo &g, int u);
+    int getCustoDoPercurso();
+    int *getPredecessores();
 };
 
-Trio::Trio(){
+void BuscaProfundidade::dfs(Grafo &g){
+    this->cores  = new Cor[g.getN()+1];
+    this->tempoD = new int[g.getN()+1];
+    this->tempoF = new int[g.getN()+1];
+    this->predecessores = new int[g.getN()+1];
+    this->custoDoPercurso = 0;
+    for(int i=1; i<=g.getN(); i++){
+        cores[i]=branco;
+        predecessores[i]=-1;
+    }
+    tempo = 0;
+    for(int i=1; i<=g.getN(); i++){
+      if(cores[i] == branco){
+          dfsVisita(g, i);
+      }
+    }
 }
 
-Trio::Trio(int vertice, int vAdj, int pesoAresta){
-    this->vertice = vertice;
-    this->vAdj = vAdj;
-    this->pesoAresta = pesoAresta;
-    // this->chave = pesoAresta;
-}
-
-int Trio::getVertice(){
-    return vertice;
-}
-
-int Trio::getVAdj(){
-    return vAdj;
-}
-
-int Trio::getPesoAresta(){
-    return pesoAresta;
-}
-int Trio::getChave(){
-    return pesoAresta;
-}
-
-void Trio::setVertice(int vertice){
-    this->vertice = vertice;
-}
-
-void Trio::setVAdj(int adj){
-    this->vAdj = adj;
-}
-
-void Trio::setPesoAresta(int pesoAresta){
-    this->pesoAresta = pesoAresta;
-}
-
-void procurarMenorComTalPesoDeAresta(Trio *vetor, int peso, int tam, int indiceAtual){
-    for(int i=indiceAtual+1; i<tam; i++){
-        if(peso == vetor[i].getPesoAresta()){
-            if(vetor[i].getVAdj()<vetor[indiceAtual].getVAdj()){
-                troca(vetor[i], vetor[indiceAtual]);
-            }
+void BuscaProfundidade::dfsVisita(Grafo &g, int u){
+    tempo++;
+    tempoD[u] = tempo;
+    cores[u] = cinza;
+    int i = 1;
+    Lista<Par> adj = g.getAdj()[u];
+    No<Par> *vertice = adj.getPrim()->getProx();
+    while(i<=adj.getTam()){
+        int v = vertice->getItem().getChave();
+        if(cores[v]==branco){
+            predecessores[v] =u;
+            custoDoPercurso+=vertice->getItem().getPesoAresta();
+            dfsVisita(g, v);
         }
+        vertice = vertice->getProx();
+        i++;
+    }
+    cores[u] = preto;
+    tempo++;
+    tempoF[u] = tempo;
+}
+
+int BuscaProfundidade::getCustoDoPercurso(){
+    return custoDoPercurso;
+}
+
+int *BuscaProfundidade::getPredecessores(){
+    return predecessores;
+}
+
+template <class Tipo>
+void printarVetor(Tipo *v, int n){
+    for(int i=1; i<=n; i++){
+        cout<<"I: "<< i<<": "<<v[i]<<endl;
     }
 }
 
-bool verificar(int v1, int v2, Trio *vetor, int tam){
-    for(int k=1; k<=tam; k++){
-        if(vetor[k].getVertice()==v2 && vetor[k].getVAdj()==v1){
+void inicializarGrafo(Grafo &g){
+    for(int i=1; i<=g.getM(); i++){
+        int u, v;
+        cin>>u;
+        cin>>v;
+        g.inserirVertice(u, v, 0);
+    }
+    // g.mostra();
+    // g.ordenarADJ();
+    g.mostra();
+    BuscaProfundidade busca;
+    busca.dfs(g);
+    int *v = busca.getPredecessores();
+    printarVetor(v, g.getN());
+    // cout<<"Criando Sistemas Planetarios"<<endl;
+}
+
+void inicializarSistemaPlanetario(Grafo &sistema){
+    // cout<<sistema.getM()<<endl;
+    for(int j=1; j<=sistema.getM(); j++){
+        int u, v;
+        float w;
+        cin>>u;
+        cin>>v;
+        cin>>w;
+        // cout<<j
+        sistema.inserirVertice(u, v, w);
+    }
+    // sistema.mostra();
+    // sistema.ordenarADJ();
+    sistema.mostra();
+}
+
+void inicializarSistemasPlanetarios(Grafo *sistemas, int n){
+    for(int i=1; i<=n; i++){
+        int ordem, tam;
+        cin>>ordem;
+        cin>>tam;
+        sistemas[i].inicializar(ordem, tam);
+        cout<<"Sistema "<<i<<endl;
+        inicializarSistemaPlanetario(sistemas[i]);
+    }
+}
+bool confere(int *v, int chave, int tam){
+    for(int i=1; i<=tam; i++){
+        if(v[i]==chave && chave!=-1){
             return true;
         }
     }
     return false;
 }
 
-class Kruskal{
-private:
-    Lista<Trio> *A;
-public:
-    void mstKruskal(Grafo &g);
-    Lista<Trio> *getA();
-};
-void Kruskal::mstKruskal(Grafo &g){
-    A = new Lista<Trio>[g.getM()+1];
-    int tamVetorArestas = g.getM()+1;
-    Trio *arestas = new Trio[tamVetorArestas];
-    for(int i = 1; i<tamVetorArestas; i++){
-        arestas[i].setVertice(-1);
-        arestas[i].setVAdj(-1);
-        arestas[i].setPesoAresta(INT_MAX);
-    }
-    int indice = 1;
-    for(int i=1; i<=g.getN(); i++){
-        No<Par> *p = g.getAdj()[i].getPrim()->getProx();
-        while(p!=NULL){
-            if(!verificar(p->getItem().getVertice(), i, arestas, tamVetorArestas)){
-                arestas[indice].setVertice(p->getItem().getVertice());
-                arestas[indice].setVAdj(i);
-                arestas[indice].setPesoAresta(p->getItem().getPesoAresta());
-                // arestas[indice].setChave(p->getItem().getPesoAresta());
-                indice++;
-            }
-            p = p->getProx();
+bool verificar(int i, int *inimigos, int tam){
+    for(int k=1; i<=tam; i++){
+        if(inimigos[k]==i && i!=-1){
+            cout<<i<<endl;
+            return true;
         }
     }
-    UnionFind uniao(g.getN());
-    Heap<Trio> heap;
-    heap.heapSort(arestas, tamVetorArestas); //ordenar as arestas não-decrescentemente de acordo com o peso das Arestas;
-    for(int i=1; i<tamVetorArestas; i++){
-        procurarMenorComTalPesoDeAresta(arestas, arestas[i].getPesoAresta(), tamVetorArestas, i);
-        // cout<<"u: "<<arestas[i].getVAdj()<<" || v: "<<arestas[i].getVertice()<<" || p: "<<arestas[i].getPesoAresta()<<endl;
-    }
-    indice = 1;
-    for(int i=1; i<tamVetorArestas; i++){
-        cout<<"u: "<<arestas[i].getVAdj()<<" || v: "<<arestas[i].getVertice()<<" || p: "<<arestas[i].getPesoAresta()<<endl;
-        int u = uniao.findSet(arestas[i].getVAdj());
-        int v = uniao.findSet(arestas[i].getVertice());
-        if(u!=v){
-            Trio aSerInserido(arestas[i].getVertice(), arestas[i].getVAdj(), arestas[i].getPesoAresta());
-            A[indice].insere(aSerInserido);
-            // cout<<"u111====> "<<u<<" ||v111====> "<<v<<endl;
-            uniao.unionThis(u, v);
-            indice++;
-        }
-    }
-    cout<<"-------------------------------------------"<<endl;
-    cout<<"Árvore minima geradora"<<endl;
-    for(int i=1; i<=g.getN(); i++){
-        No<Trio> *p = A[i].getPrim()->getProx();
-        while (p!=NULL) {
-            cout<<"u: "<<p->getItem().getVAdj()<<" || v: "<<p->getItem().getVertice()<<" || p: "<<p->getItem().getPesoAresta()<<endl;
-            p=p->getProx();
-        }
-    }
+    return false;
 }
 
-Lista<Trio> *Kruskal::getA(){
-    return A;
+float explorarSistema(Grafo &sistema, int n, int *inimigos, int quantidadeDeInimigos){
+    float valorDoCaminho = 0;
+    BuscaProfundidade busca;
+    busca.dfs(sistema);
+    valorDoCaminho+=busca.getCustoDoPercurso();
+    return valorDoCaminho;
 }
 
-void testaGrafo(Grafo &g){
-    Kruskal kruskal;
-    for(int i=1; i<=g.getM(); i++){
-        int u, v, w;
-        cin>>u>>v>>w;
-        g.inserirVertice(u, v, w);
+void explorarUniverso(Grafo &g, Grafo *sistemas, int *inimigos, int quantidadeDeInimigos){
+    BuscaProfundidade busca;
+    busca.dfs(g);
+    int *sistemasASeremVisitados = busca.getPredecessores();
+    printarVetor(sistemasASeremVisitados, g.getN());
+    float custoTotal = 0;
+    for(int sistemaPlanetario = 1; sistemaPlanetario<=g.getN(); sistemaPlanetario++){
+        if(!verificar(sistemaPlanetario, inimigos, quantidadeDeInimigos) && confere(sistemasASeremVisitados, sistemaPlanetario, g.getN())){
+            custoTotal += explorarSistema(sistemas[sistemaPlanetario], g.getN(), inimigos, quantidadeDeInimigos);
+        }
     }
-    g.mostra();
-    kruskal.mstKruskal(g);
+    cout<<custoTotal<<endl;
 }
-int main(){
-    int n, m;
-	n=8;
-    m=18;
-	Grafo g(n, m);
-	testaGrafo(g);
+
+int main(int argc, char const *argv[]) {
+    int N, M;
+    cin>>N;
+    cin>>M;
+    Grafo g(N, M);
+    Grafo *sistemas = new Grafo[N+1];
+    int quantidadeDeInimigos, *inimigos, sistemaInicial, sistemaFinal;
+    inicializarGrafo(g);
+    cin>>quantidadeDeInimigos;
+    inimigos = new int[quantidadeDeInimigos+1];
+    for(int i=1; i<=quantidadeDeInimigos; i++){
+        cin>>inimigos[i];
+    }
+    cin>>sistemaInicial>>sistemaFinal;
+    inicializarSistemasPlanetarios(sistemas, N);
+    explorarUniverso(g, sistemas, inimigos, quantidadeDeInimigos);
     return 0;
 }

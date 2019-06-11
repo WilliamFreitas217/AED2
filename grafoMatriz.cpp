@@ -29,18 +29,18 @@ Grafo<Tipo>::Grafo(){
 }
 template <class Tipo>
 Grafo<Tipo>::Grafo(int n){
-  this->n = n;
-  mat = new Peso *[n];
-  for(int i=0; i<=n; i++){
-    mat[i] = new Peso[n];
-  }
-	inicializar(n);
+    this->n = n;
+    mat = new Peso *[n+1];
+    for(int i=0; i<=n; i++){
+      mat[i] = new Peso[n+1];
+    }
+    inicializar(n);
 }
 
 template <class Tipo>
 void Grafo<Tipo>::inicializar(int n){
-	for(int i=0; i<n; i++){
-    for(int j=0; j<n; j++){
+	for(int i=0; i<=n; i++){
+    for(int j=0; j<=n; j++){
       mat[i][j]=0;
     }
   }
@@ -48,7 +48,7 @@ void Grafo<Tipo>::inicializar(int n){
 
 template <class Tipo>
 void Grafo<Tipo>::inserirVertice(Vertice u, Vertice v, Peso w){
-	mat[u-1][v-1] = w;
+	mat[u][v] = w;
   // mat[v-1][u-1] = w; //deve ser desativada caso o grafo seja direcionado
   m++;
 }
@@ -57,18 +57,18 @@ template <class Tipo>
 void Grafo<Tipo>::mostra(){
 	int k = 3;
   cout<<" ";
-  for(int j=0; j< n; j++){
-    cout<< setw(k)<<j+1;
+  for(int j=1; j<= n; j++){
+    cout<< setw(k)<<j;
   }
   cout<<endl;
   for(int j=0; j< n*k+3; j++){
     cout<<"-";
   }
   cout<<endl;
-  for(int i=0; i<n; i++){
-    cout<<setw(1)<<i+1;
+  for(int i=1; i<=n; i++){
+    cout<<setw(1)<<i;
     cout<<"|";
-    for(int j=0; j<n; j++){
+    for(int j=1; j<=n; j++){
       cout<<setw(k)<<mat[i][j];
     }
     cout<<endl;
